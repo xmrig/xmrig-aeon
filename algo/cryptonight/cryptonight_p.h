@@ -133,7 +133,7 @@ inline void cn_explode_scratchpad(const __m128i* input, __m128i* output)
     xin6 = _mm_load_si128(input + 10);
     xin7 = _mm_load_si128(input + 11);
 
-    for (size_t i = 0; __builtin_expect(i < MEMORY / sizeof(__m128i), 1); i += 8) {
+    for (size_t i = 0; __builtin_expect(i < MEMORY_LITE / sizeof(__m128i), 1); i += 8) {
         aes_round(k0, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k1, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k2, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
@@ -176,7 +176,7 @@ inline void cn_implode_scratchpad(const __m128i* input, __m128i* output)
     xout6 = _mm_load_si128(output + 10);
     xout7 = _mm_load_si128(output + 11);
 
-    for (size_t i = 0; __builtin_expect(i < MEMORY / sizeof(__m128i), 1); i += 8)
+    for (size_t i = 0; __builtin_expect(i < MEMORY_LITE / sizeof(__m128i), 1); i += 8)
     {
         _mm_prefetch((const char*)input + i + 0, _MM_HINT_NTA);
         xout0 = _mm_xor_si128(_mm_load_si128(input + i + 0), xout0);

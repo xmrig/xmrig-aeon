@@ -124,7 +124,7 @@ static inline void cn_explode_scratchpad(const __m128i* input, __m128i* output)
     xin6 = _mm_load_si128(input + 10);
     xin7 = _mm_load_si128(input + 11);
 
-    for (size_t i = 0; i < MEMORY / sizeof(__m128i); i += 8) {
+    for (size_t i = 0; i < MEMORY_LITE / sizeof(__m128i); i += 8) {
         aes_round(k0, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k1, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k2, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
@@ -167,7 +167,7 @@ static inline void cn_implode_scratchpad(const __m128i* input, __m128i* output)
     xout6 = _mm_load_si128(output + 10);
     xout7 = _mm_load_si128(output + 11);
 
-    for (size_t i = 0; i < MEMORY / sizeof(__m128i); i += 8)
+    for (size_t i = 0; i < MEMORY_LITE / sizeof(__m128i); i += 8)
     {
         _mm_prefetch((const char*)input + i + 0, _MM_HINT_NTA);
         xout0 = _mm_xor_si128(_mm_load_si128(input + i + 0), xout0);
@@ -218,25 +218,25 @@ void cryptonight_av4_softaes(const void *restrict input, size_t size, void *rest
 
     uint64_t idx0 = h0[0] ^ h0[4];
 
-    for (size_t i = 0; __builtin_expect(i < 0x80000, 1); i++) {
+    for (size_t i = 0; __builtin_expect(i < 0x40000, 1); i++) {
         __m128i cx;
-        cx = _mm_load_si128((__m128i *)&l0[idx0 & 0x1FFFF0]);
+        cx = _mm_load_si128((__m128i *)&l0[idx0 & 0xFFFF0]);
         cx = soft_aesenc(cx, _mm_set_epi64x(ah0, al0));
 
-        _mm_store_si128((__m128i *)&l0[idx0 & 0x1FFFF0], _mm_xor_si128(bx0, cx));
+        _mm_store_si128((__m128i *)&l0[idx0 & 0xFFFF0], _mm_xor_si128(bx0, cx));
         idx0 = _mm_cvtsi128_si64(cx);
         bx0 = cx;
 
         uint64_t hi, lo, cl, ch;
-        cl = ((uint64_t*)&l0[idx0 & 0x1FFFF0])[0];
-        ch = ((uint64_t*)&l0[idx0 & 0x1FFFF0])[1];
+        cl = ((uint64_t*)&l0[idx0 & 0xFFFF0])[0];
+        ch = ((uint64_t*)&l0[idx0 & 0xFFFF0])[1];
         lo = _umul128(idx0, cl, &hi);
 
         al0 += hi;
         ah0 += lo;
 
-        ((uint64_t*)&l0[idx0 & 0x1FFFF0])[0] = al0;
-        ((uint64_t*)&l0[idx0 & 0x1FFFF0])[1] = ah0;
+        ((uint64_t*)&l0[idx0 & 0xFFFF0])[0] = al0;
+        ((uint64_t*)&l0[idx0 & 0xFFFF0])[1] = ah0;
 
         ah0 ^= ch;
         al0 ^= cl;
