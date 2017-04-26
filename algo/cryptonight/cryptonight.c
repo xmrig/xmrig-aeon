@@ -139,20 +139,17 @@ void (* const extra_hashes[4])(const void *, size_t, char *) = {do_blake_hash, d
 #ifndef BUILD_TEST
 int scanhash_cryptonight(int thr_id, uint32_t *hash, uint32_t *restrict blob, size_t blob_size, uint32_t target, uint32_t max_nonce, unsigned long *restrict hashes_done, struct cryptonight_ctx *restrict ctx) {
     uint32_t *nonceptr = (uint32_t*) (((char*) blob) + 39);
-    uint32_t n = *nonceptr - 1;
-    const uint32_t first_nonce = n + 1;
 
     do {
-        *nonceptr = ++n;
         cryptonight_hash_ctx(blob, blob_size, hash, ctx);
+        (*hashes_done)++;
 
         if (unlikely(hash[7] < target)) {
-            *hashes_done = n - first_nonce + 1;
             return true;
         }
-    } while (likely((n <= max_nonce && !work_restart[thr_id].restart)));
 
-    *hashes_done = n - first_nonce + 1;
+        (*nonceptr)++;
+    } while (likely(((*nonceptr) < max_nonce && !work_restart[thr_id].restart)));
     return 0;
 }
 #endif

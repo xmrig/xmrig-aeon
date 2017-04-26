@@ -46,6 +46,7 @@ enum xmr_algo_variant {
 extern bool opt_colors;
 extern bool opt_keepalive;
 extern bool opt_background;
+extern bool opt_double_hash;
 extern char *opt_url;
 extern char *opt_backup_url;
 extern char *opt_userpass;

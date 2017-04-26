@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "persistent_memory.h"
+#include "options.h"
 #include "algo/cryptonight/cryptonight.h"
 
 static size_t offset = 0;
@@ -40,7 +41,17 @@ void * persistent_calloc(size_t num, size_t size) {
 
 
 void * create_persistent_ctx(int thr_id) {
-    struct cryptonight_ctx *ctx = (struct cryptonight_ctx *) &persistent_memory[MEMORY - sizeof(struct cryptonight_ctx) * (thr_id + 1)];
+    struct cryptonight_ctx *ctx = NULL;
+
+    if (!opt_double_hash) {
+        const size_t offset = MEMORY * (thr_id + 1);
+
+        ctx = (struct cryptonight_ctx *) &persistent_memory[offset + MEMORY_LITE];
+        ctx->memory = &persistent_memory[offset];
+        return ctx;
+    }
+
+    ctx = (struct cryptonight_ctx *) &persistent_memory[MEMORY - sizeof(struct cryptonight_ctx) * (thr_id + 1)];
     ctx->memory = &persistent_memory[MEMORY * (thr_id + 1)];
 
     return ctx;

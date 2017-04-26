@@ -45,6 +45,7 @@ int     opt_donate_level = DONATE_LEVEL;
 bool    opt_colors       = true;
 bool    opt_keepalive    = false;
 bool    opt_background   = false;
+bool    opt_double_hash  = true;
 char    *opt_url         = NULL;
 char    *opt_backup_url  = NULL;
 char    *opt_userpass    = NULL;
@@ -387,10 +388,6 @@ void parse_cmdline(int argc, char *argv[]) {
     opt_algo_variant = get_algo_variant(opt_algo_variant);
     if (!opt_algo_variant) {
         opt_algo_variant = get_algo_variant(0);
-    }
-
-    if (opt_donate_level < 1 || opt_donate_level > 99) {
-        opt_donate_level = 1;
     }
 
     if (!cryptonight_init(opt_algo_variant)) {

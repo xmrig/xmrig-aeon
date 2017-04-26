@@ -71,14 +71,6 @@ static void workio_cmd_free(struct workio_cmd *wc);
 
 
 /**
- * @brief work_free
- * @param w
- */
-static inline void work_free(struct work *w) {
-}
-
-
-/**
  * @brief work_copy
  * @param dest
  * @param src
@@ -149,7 +141,6 @@ static bool submit_upstream_work(struct work *work) {
         return false;
     }
 
-
     return true;
 }
 
@@ -164,7 +155,6 @@ static void workio_cmd_free(struct workio_cmd *wc) {
         return;
     }
 
-    work_free(wc->work);
     free(wc->work);
 
     memset(wc, 0, sizeof(*wc)); /* poison */
@@ -276,11 +266,11 @@ static void *miner_thread(void *userdata) {
         affine_to_cpu_mask(thr_id, (unsigned long) opt_affinity);
     }
 
-    uint32_t *nonceptr = (uint32_t*) (((char*)work.blob) + 39);
+    uint32_t *nonceptr = (uint32_t*) (((char*) work.blob) + 39);
     uint32_t hash[8] __attribute__((aligned(32)));
 
     while (1) {
-        unsigned long hashes_done;
+        unsigned long hashes_done = 0;
         struct timeval tv_start;
         int64_t max64;
         int rc;
@@ -293,7 +283,6 @@ static void *miner_thread(void *userdata) {
         pthread_mutex_lock(&stratum_ctx->work_lock);
 
         if (memcmp(work.blob, stratum_ctx->g_work.blob, 39) || memcmp(((uint8_t*) work.blob) + 43, ((uint8_t*) stratum_ctx->g_work.blob) + 43, 33)) {
-            work_free(&work);
             work_copy(&work, &stratum_ctx->g_work);
             nonceptr = (uint32_t*) (((char*) work.blob) + 39);
             *nonceptr = 0xffffffffU / opt_n_threads * thr_id;
@@ -308,7 +297,6 @@ static void *miner_thread(void *userdata) {
         /* adjust max_nonce to meet target scan time */
         max64 = LP_SCANTIME;
 
-        //max64 *= thr_hashrates[thr_id];
         if (max64 <= 0) {
             max64 = 0x40LL;
         }
