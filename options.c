@@ -45,7 +45,7 @@ int     opt_donate_level = DONATE_LEVEL;
 bool    opt_colors       = true;
 bool    opt_keepalive    = false;
 bool    opt_background   = false;
-bool    opt_double_hash  = true;
+bool    opt_double_hash  = false;
 char    *opt_url         = NULL;
 char    *opt_backup_url  = NULL;
 char    *opt_userpass    = NULL;
@@ -364,12 +364,12 @@ void parse_cmdline(int argc, char *argv[]) {
     }
 
     if (!opt_url) {
-        opt_url = strdup("stratum+tcp://proxy.xmrig.com:443");
-        opt_keepalive = true;
+        opt_url = strdup("stratum+tcp://proxy.xmrig.com:3333");
+//        opt_keepalive = true;
 
-        if (!opt_backup_url) {
-            opt_backup_url = strdup("stratum+tcp://failover.xmrig.com:80");
-        }
+//        if (!opt_backup_url) {
+//            opt_backup_url = strdup("stratum+tcp://failover.xmrig.com:80");
+//        }
     }
 
     if (!opt_userpass) {

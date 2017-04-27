@@ -32,8 +32,9 @@
 #define MEMORY_LITE 1048576 /* 1 MiB */
 
 struct cryptonight_ctx {
-    uint8_t state[200] __attribute__((aligned(16)));
-    uint8_t* memory    __attribute__((aligned(16)));
+    uint8_t state0[200] __attribute__((aligned(16)));
+    uint8_t state1[200] __attribute__((aligned(16)));
+    uint8_t* memory     __attribute__((aligned(16)));
 };
 
 
