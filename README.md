@@ -1,8 +1,6 @@
-# XMRig
-XMRig is high performance Monero (XMR) CPU miner, with the official full Windows support.
+# XMRig for AEON
+XMRig is high performance [AEON](http://www.aeon.cash/) CPU miner, with the official full Windows support.
 Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of legacy code.
-
-<img src="http://i.imgur.com/GdRDnAu.png" width="596" >
 
 #### Table of contents
 * [Features](#features)
@@ -15,7 +13,7 @@ Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of 
 * [Donations](#Donations)
 
 ## Features
-* High performance (290+ H/s on i7 6700).
+* ~~High performance (290+ H/s on i7 6700).~~
 * Official Windows support.
 * Small Windows executable, only 430 KB without dependencies.
 * Support for backup (failover) mining server.
@@ -24,9 +22,9 @@ Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of 
 * It's open source software.
 
 ## Download
-* Binary releases: https://github.com/xmrig/xmrig/releases
-* Git tree: https://github.com/xmrig/xmrig.git
-  * Clone with `git clone https://github.com/xmrig/xmrig.git`
+* Binary releases: https://github.com/xmrig/xmrig-aeon/releases
+* Git tree: https://github.com/xmrig/xmrig-aeon.git
+  * Clone with `git clone https://github.com/xmrig/xmrig-aeon.git`
 
 ## Usage
 ### Basic example
@@ -56,20 +54,17 @@ xmrig.exe -o xmr-eu.dwarfpool.com:8005 -u YOUR_WALLET -p x -k
 ```
 
 ## Algorithm variations
-Since version 0.6.0.
 * `--av=1` Default for CPUs with hardware AES.
-* `--av=2` [XMR-Stak-CPU](https://github.com/fireice-uk/xmr-stak-cpu) algorithm.
-* `--av=3` Same as `1` but uses BMI2 instruction [mulx](https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mulx_u64).
-* `--av=4` Software AES implementation.
-
-For 32 bit platform only available `1` and `4`.
+* `--av=2` Double hash hardware AES.
+* `--av=3` Software AES implementation.
+* `--av=4` Double hash software AES implementation.
 
 ## Build
 ### Ubuntu (Debian-based distros)
 ```
 sudo apt-get install git build-essential cmake libcurl4-openssl-dev
-git clone https://github.com/xmrig/xmrig.git
-cd xmrig
+git clone https://github.com/xmrig/xmrig-aeon.git
+cd xmrig-aeon
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -109,8 +104,8 @@ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCURL_INCLUDE_DIR="c:\<
 
 
 ### CPU mining performance
-* **i7-6700** - 290+ H/s (4 threads, cpu affinity 0xAA)
-* **Dual E5620** - 377 H/s (12 threads, cpu affinity 0xEEEE)
+* ~~**i7-6700** - 290+ H/s (4 threads, cpu affinity 0xAA)~~
+* ~~**Dual E5620** - 377 H/s (12 threads, cpu affinity 0xEEEE)~~
 
 Please note performance is highly dependent on system load. The numbers above are obtained on an idle system. Tasks heavily using a processor cache, such as video playback, can greatly degrade hashrate. Optimal number of threads depends on the size of the L3 cache of a processor, 1 thread requires 2 MB of cache.
 

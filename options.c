@@ -103,15 +103,15 @@ static struct option const options[] = {
 
 
 static int get_algo_variant(int variant) {
-   if (variant > XMR_AV0_AUTO && variant < XMR_AV_MAX) {
+   if (variant > AEON_AV0_AUTO && variant < AEON_AV_MAX) {
        return variant;
    }
 
    if (cpu_info.flags & CPU_FLAG_AES) {
-       return XMR_AV1_AESNI;
+       return AEON_AV1_AESNI;
    }
 
-   return XMR_AV4_SOFT_AES;
+   return AEON_AV3_SOFT_AES;
 }
 
 
@@ -234,7 +234,7 @@ static void parse_arg(int key, char *arg) {
 
     case 'v': /* --av */
         v = atoi(arg);
-        if (v < 0 || v > XMR_AV_MAX) {
+        if (v < 0 || v > AEON_AV_MAX) {
             show_usage_and_exit(1);
         }
 

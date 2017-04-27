@@ -98,17 +98,15 @@ if (CURL_FOUND)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    add_subdirectory(algo/cryptonight/bmi2)
-
     set(CRYPTONIGHT64
         algo/cryptonight/cryptonight_av1_aesni.c
-        algo/cryptonight/cryptonight_av2_aesni_stak.c
-        algo/cryptonight/cryptonight_av4_softaes.c
-        algo/cryptonight/cryptonight_av5_aesni_experimental.c
+        algo/cryptonight/cryptonight_av2_aesni_double.c
+        algo/cryptonight/cryptonight_av3_softaes.c
+        algo/cryptonight/cryptonight_av3_softaes_double.c
     )
 
     add_executable(xmrig-aeon ${HEADERS} ${HEADERS_CRYPTO} ${SOURCES} ${SOURCES_CRYPTO} ${HEADERS_UTILS} ${SOURCES_UTILS} ${HEADERS_COMPAT} ${SOURCES_COMPAT} ${SOURCES_OS} ${CRYPTONIGHT64})
-    target_link_libraries(xmrig-aeon jansson curl cryptonight_av3_aesni_bmi2 ${EXTRA_LIBS})
+    target_link_libraries(xmrig-aeon jansson curl ${EXTRA_LIBS})
 else()
     set(CRYPTONIGHT32
         algo/cryptonight/i686/cryptonight_av1_aesni.c

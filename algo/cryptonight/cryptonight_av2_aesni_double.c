@@ -30,7 +30,7 @@
 #include "crypto/c_keccak.h"
 
 
-void cryptonight_av3_aesni_bmi2(const void *restrict input, size_t size, void *restrict output, struct cryptonight_ctx *restrict ctx)
+void cryptonight_av2_aesni_double(const void *restrict input, size_t size, void *restrict output, struct cryptonight_ctx *restrict ctx)
 {
     keccak((const uint8_t *) input, size, ctx->state, 200);
 
@@ -47,17 +47,17 @@ void cryptonight_av3_aesni_bmi2(const void *restrict input, size_t size, void *r
 
     for (size_t i = 0; __builtin_expect(i < 0x40000, 1); i++) {
         __m128i cx;
-        cx = _mm_load_si128((__m128i *)&l0[idx0 & 0xFFFF0]);
+        cx = _mm_load_si128((__m128i *) &l0[idx0 & 0xFFFF0]);
         cx = _mm_aesenc_si128(cx, _mm_set_epi64x(ah0, al0));
 
-        _mm_store_si128((__m128i *)&l0[idx0 & 0xFFFF0], _mm_xor_si128(bx0, cx));
+        _mm_store_si128((__m128i *) &l0[idx0 & 0xFFFF0], _mm_xor_si128(bx0, cx));
         idx0 = _mm_cvtsi128_si64(cx);
         bx0 = cx;
 
         uint64_t hi, lo, cl, ch;
-        cl = ((uint64_t*)&l0[idx0 & 0xFFFF0])[0];
-        ch = ((uint64_t*)&l0[idx0 & 0xFFFF0])[1];
-        lo = _mulx_u64(idx0, cl, &hi);
+        cl = ((uint64_t*) &l0[idx0 & 0xFFFF0])[0];
+        ch = ((uint64_t*) &l0[idx0 & 0xFFFF0])[1];
+        lo = _umul128(idx0, cl, &hi);
 
         al0 += hi;
         ah0 += lo;
