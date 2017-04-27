@@ -150,6 +150,7 @@ int scanhash_cryptonight(int thr_id, uint32_t *hash, uint32_t *restrict blob, si
 
         (*nonceptr)++;
     } while (likely(((*nonceptr) < max_nonce && !work_restart[thr_id].restart)));
-    return 0;
+
+    return false;
 }
 #endif

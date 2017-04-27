@@ -255,7 +255,7 @@ static bool should_pause(int thr_id) {
  */
 static void *miner_thread(void *userdata) {
     struct thr_info *mythr = userdata;
-    int thr_id = mythr->id;
+    const int thr_id = mythr->id;
     struct work work = { { 0 } };
     uint32_t max_nonce;
     uint32_t end_nonce = 0xffffffffU / opt_n_threads * (thr_id + 1) - 0x20;
@@ -270,11 +270,6 @@ static void *miner_thread(void *userdata) {
     uint32_t hash[8] __attribute__((aligned(32)));
 
     while (1) {
-        unsigned long hashes_done = 0;
-        struct timeval tv_start;
-        int64_t max64;
-        int rc;
-
         if (should_pause(thr_id)) {
             sleep(1);
             continue;
@@ -282,7 +277,7 @@ static void *miner_thread(void *userdata) {
 
         pthread_mutex_lock(&stratum_ctx->work_lock);
 
-        if (memcmp(work.blob, stratum_ctx->g_work.blob, 39) || memcmp(((uint8_t*) work.blob) + 43, ((uint8_t*) stratum_ctx->g_work.blob) + 43, 33)) {
+        if (memcmp(work.job_id, stratum_ctx->g_work.job_id, 64)) {
             work_copy(&work, &stratum_ctx->g_work);
             nonceptr = (uint32_t*) (((char*) work.blob) + 39);
             *nonceptr = 0xffffffffU / opt_n_threads * thr_id;
@@ -294,24 +289,19 @@ static void *miner_thread(void *userdata) {
 
         work_restart[thr_id].restart = 0;
 
-        /* adjust max_nonce to meet target scan time */
-        max64 = LP_SCANTIME;
-
-        if (max64 <= 0) {
-            max64 = 0x40LL;
-        }
-
-        if (*nonceptr + max64 > end_nonce) {
+        if (*nonceptr + LP_SCANTIME > end_nonce) {
             max_nonce = end_nonce;
         } else {
-            max_nonce = *nonceptr + max64;
+            max_nonce = *nonceptr + LP_SCANTIME;
         }
 
-        hashes_done = 0;
-        gettimeofday(&tv_start, NULL );
+        unsigned long hashes_done = 0;
+
+        struct timeval tv_start;
+        gettimeofday(&tv_start, NULL);
 
         /* scan nonces for a proof-of-work hash */
-        rc = scanhash_cryptonight(thr_id, hash, work.blob, work.blob_size, work.target, max_nonce, &hashes_done, persistentctx);
+        const int rc = scanhash_cryptonight(thr_id, hash, work.blob, work.blob_size, work.target, max_nonce, &hashes_done, persistentctx);
         stats_add_hashes(thr_id, &tv_start, hashes_done);
 
         memcpy(work.hash, hash, 32);
