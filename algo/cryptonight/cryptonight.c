@@ -71,14 +71,14 @@ void (*cryptonight_hash_ctx)(const void* input, size_t size, void* output, struc
 static bool self_test() {
     char output[64];
 
-    struct cryptonight_ctx *ctx = (struct cryptonight_ctx*) malloc(sizeof(struct cryptonight_ctx));
-    ctx->memory = (uint8_t *) malloc(MEMORY);
+    struct cryptonight_ctx *ctx = (struct cryptonight_ctx*) _mm_malloc(sizeof(struct cryptonight_ctx), 16);
+    ctx->memory = (uint8_t *) _mm_malloc(MEMORY, 16);
 
 
     cryptonight_hash_ctx(test_input, 76, output, ctx);
 
-    free(ctx->memory);
-    free(ctx);
+    _mm_free(ctx->memory);
+    _mm_free(ctx);
 
     return memcmp(output, test_output, (opt_double_hash ? 64 : 32)) == 0;
 }

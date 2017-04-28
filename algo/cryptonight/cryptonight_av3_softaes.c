@@ -51,7 +51,7 @@ void cryptonight_av3_softaes(const void *restrict input, size_t size, void *rest
         cx = soft_aesenc(cx, _mm_set_epi64x(ah0, al0));
 
         _mm_store_si128((__m128i *)&l0[idx0 & 0xFFFF0], _mm_xor_si128(bx0, cx));
-        idx0 = _mm_cvtsi128_si64(cx);
+        idx0 = EXTRACT64(cx);
         bx0 = cx;
 
         uint64_t hi, lo, cl, ch;

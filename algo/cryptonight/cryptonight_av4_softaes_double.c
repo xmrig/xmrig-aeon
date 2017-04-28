@@ -64,8 +64,8 @@ void cryptonight_av4_softaes_double(const void *restrict input, size_t size, voi
         _mm_store_si128((__m128i *) &l0[idx0 & 0xFFFF0], _mm_xor_si128(bx0, cx0));
         _mm_store_si128((__m128i *) &l1[idx1 & 0xFFFF0], _mm_xor_si128(bx1, cx1));
 
-        idx0 = _mm_cvtsi128_si64(cx0);
-        idx1 = _mm_cvtsi128_si64(cx1);
+        idx0 = EXTRACT64(cx0);
+        idx1 = EXTRACT64(cx1);
 
         bx0 = cx0;
         bx1 = cx1;

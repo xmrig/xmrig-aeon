@@ -37,6 +37,10 @@ set(HEADERS_UTILS
 set(SOURCES
     xmrig.c
     algo/cryptonight/cryptonight.c
+    algo/cryptonight/cryptonight_av1_aesni.c
+    algo/cryptonight/cryptonight_av2_aesni_double.c
+    algo/cryptonight/cryptonight_av3_softaes.c
+    algo/cryptonight/cryptonight_av4_softaes_double.c
     util.c
     options.c
     cpu.c
@@ -98,22 +102,10 @@ if (CURL_FOUND)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CRYPTONIGHT64
-        algo/cryptonight/cryptonight_av1_aesni.c
-        algo/cryptonight/cryptonight_av2_aesni_double.c
-        algo/cryptonight/cryptonight_av3_softaes.c
-        algo/cryptonight/cryptonight_av4_softaes_double.c
-    )
-
-    add_executable(xmrig-aeon ${HEADERS} ${HEADERS_CRYPTO} ${SOURCES} ${SOURCES_CRYPTO} ${HEADERS_UTILS} ${SOURCES_UTILS} ${HEADERS_COMPAT} ${SOURCES_COMPAT} ${SOURCES_OS} ${CRYPTONIGHT64})
+    add_executable(xmrig-aeon ${HEADERS} ${HEADERS_CRYPTO} ${SOURCES} ${SOURCES_CRYPTO} ${HEADERS_UTILS} ${SOURCES_UTILS} ${HEADERS_COMPAT} ${SOURCES_COMPAT} ${SOURCES_OS})
     target_link_libraries(xmrig-aeon jansson curl ${EXTRA_LIBS})
 else()
-    set(CRYPTONIGHT32
-        algo/cryptonight/i686/cryptonight_av1_aesni.c
-        algo/cryptonight/i686/cryptonight_av4_softaes.c
-    )
-
-    add_executable(xmrig-aeon32 ${HEADERS} ${HEADERS_CRYPTO} ${SOURCES} ${SOURCES_CRYPTO} ${HEADERS_UTILS} ${SOURCES_UTILS} ${HEADERS_COMPAT} ${SOURCES_COMPAT} ${SOURCES_OS} ${CRYPTONIGHT32})
+    add_executable(xmrig-aeon32 ${HEADERS} ${HEADERS_CRYPTO} ${SOURCES} ${SOURCES_CRYPTO} ${HEADERS_UTILS} ${SOURCES_UTILS} ${HEADERS_COMPAT} ${SOURCES_COMPAT} ${SOURCES_OS})
     target_link_libraries(xmrig-aeon32 jansson curl ${EXTRA_LIBS})
 endif()
 
