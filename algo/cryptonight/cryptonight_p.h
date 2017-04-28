@@ -149,12 +149,10 @@ inline void cn_explode_scratchpad(const __m128i* input, __m128i* output)
         _mm_store_si128(output + i + 1, xin1);
         _mm_store_si128(output + i + 2, xin2);
         _mm_store_si128(output + i + 3, xin3);
-        _mm_prefetch((const char*)output + i + 0, _MM_HINT_T2);
         _mm_store_si128(output + i + 4, xin4);
         _mm_store_si128(output + i + 5, xin5);
         _mm_store_si128(output + i + 6, xin6);
         _mm_store_si128(output + i + 7, xin7);
-        _mm_prefetch((const char*)output + i + 4, _MM_HINT_T2);
     }
 }
 
@@ -178,12 +176,10 @@ inline void cn_implode_scratchpad(const __m128i* input, __m128i* output)
 
     for (size_t i = 0; __builtin_expect(i < MEMORY_LITE / sizeof(__m128i), 1); i += 8)
     {
-        _mm_prefetch((const char*)input + i + 0, _MM_HINT_NTA);
         xout0 = _mm_xor_si128(_mm_load_si128(input + i + 0), xout0);
         xout1 = _mm_xor_si128(_mm_load_si128(input + i + 1), xout1);
         xout2 = _mm_xor_si128(_mm_load_si128(input + i + 2), xout2);
         xout3 = _mm_xor_si128(_mm_load_si128(input + i + 3), xout3);
-        _mm_prefetch((const char*)input + i + 4, _MM_HINT_NTA);
         xout4 = _mm_xor_si128(_mm_load_si128(input + i + 4), xout4);
         xout5 = _mm_xor_si128(_mm_load_si128(input + i + 5), xout5);
         xout6 = _mm_xor_si128(_mm_load_si128(input + i + 6), xout6);

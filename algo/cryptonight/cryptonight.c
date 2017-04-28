@@ -62,7 +62,7 @@ const static char test_output[64] = {
 void cryptonight_av1_aesni(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx);
 void cryptonight_av2_aesni_double(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx);
 void cryptonight_av3_softaes(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx);
-void cryptonight_av3_softaes_double(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx);
+void cryptonight_av4_softaes_double(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx);
 
 
 void (*cryptonight_hash_ctx)(const void* input, size_t size, void* output, struct cryptonight_ctx* ctx) = NULL;
@@ -102,7 +102,7 @@ bool cryptonight_init(int variant)
 
         case AEON_AV4_SOFT_AES_DOUBLE:
             opt_double_hash = true;
-            cryptonight_hash_ctx = cryptonight_av3_softaes_double;
+            cryptonight_hash_ctx = cryptonight_av4_softaes_double;
             break;
 
         default:
