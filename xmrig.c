@@ -266,7 +266,7 @@ static void *miner_thread(void *userdata) {
         affine_to_cpu_mask(thr_id, (unsigned long) opt_affinity);
     }
 
-    uint32_t *nonceptr = (uint32_t*) (((char*) work.blob) + 39);
+    uint32_t *nonceptr = NULL;
     uint32_t hash[8] __attribute__((aligned(32)));
 
     while (1) {
@@ -281,8 +281,6 @@ static void *miner_thread(void *userdata) {
             work_copy(&work, &stratum_ctx->g_work);
             nonceptr = (uint32_t*) (((char*) work.blob) + 39);
             *nonceptr = 0xffffffffU / opt_n_threads * thr_id;
-        } else {
-            ++(*nonceptr);
         }
 
         pthread_mutex_unlock(&stratum_ctx->work_lock);
@@ -304,18 +302,107 @@ static void *miner_thread(void *userdata) {
         const int rc = scanhash_cryptonight(thr_id, hash, work.blob, work.blob_size, work.target, max_nonce, &hashes_done, persistentctx);
         stats_add_hashes(thr_id, &tv_start, hashes_done);
 
-        memcpy(work.hash, hash, 32);
-
-        /* if nonce found, submit work */
-        if (rc && !submit_work(mythr, &work)) {
+       if (!rc) {
             continue;
         }
+
+        memcpy(work.hash, hash, 32);
+        submit_work(mythr, &work);
+        ++(*nonceptr);
     }
 
     tq_freeze(mythr->q);
     return NULL;
 }
 
+
+/**
+ * @brief miner_thread_double
+ * @param userdata
+ * @return
+ */
+static void *miner_thread_double(void *userdata) {
+    struct thr_info *mythr = userdata;
+    const int thr_id = mythr->id;
+    struct work work = { { 0 } };
+    uint32_t max_nonce;
+    uint32_t end_nonce = 0xffffffffU / opt_n_threads * (thr_id + 1) - 0x20;
+
+    struct cryptonight_ctx *persistentctx = (struct cryptonight_ctx *) create_persistent_ctx(thr_id);
+
+    if (cpu_info.count > 1 && opt_affinity != -1L) {
+        affine_to_cpu_mask(thr_id, (unsigned long) opt_affinity);
+    }
+
+    uint32_t *nonceptr0 = NULL;
+    uint32_t *nonceptr1 = NULL;
+    uint8_t double_hash[64];
+    uint8_t double_blob[sizeof(work.blob) * 2];
+
+    while (1) {
+        if (should_pause(thr_id)) {
+            sleep(1);
+            continue;
+        }
+
+        pthread_mutex_lock(&stratum_ctx->work_lock);
+
+        if (memcmp(work.job_id, stratum_ctx->g_work.job_id, 64)) {
+            work_copy(&work, &stratum_ctx->g_work);
+
+            memcpy(double_blob,                  work.blob, work.blob_size);
+            memcpy(double_blob + work.blob_size, work.blob, work.blob_size);
+
+            nonceptr0 = (uint32_t*) (((char*) double_blob) + 39);
+            nonceptr1 = (uint32_t*) (((char*) double_blob) + 39 + work.blob_size);
+
+            uint32_t nonce = 0xffffffffU / opt_n_threads * thr_id;
+            *nonceptr0 = nonce;
+            *nonceptr1 = nonce;
+        }
+
+        pthread_mutex_unlock(&stratum_ctx->work_lock);
+
+        work_restart[thr_id].restart = 0;
+
+        if (*nonceptr1 + LP_SCANTIME > end_nonce) {
+            max_nonce = end_nonce;
+        } else {
+            max_nonce = *nonceptr1 + LP_SCANTIME;
+        }
+
+        unsigned long hashes_done = 0;
+
+        struct timeval tv_start;
+        gettimeofday(&tv_start, NULL);
+
+        /* scan nonces for a proof-of-work hash */
+        const int rc = scanhash_cryptonight_double(thr_id, (uint32_t *) double_hash, double_blob, work.blob_size, work.target, max_nonce, &hashes_done, persistentctx);
+        stats_add_hashes(thr_id, &tv_start, hashes_done);
+
+        if (!rc) {
+            continue;
+        }
+
+        if (rc & 1) {
+            memcpy(work.hash, double_hash, 32);
+            memcpy(work.blob, double_blob, work.blob_size);
+            submit_work(mythr, &work);
+        }
+
+        if (rc & 2) {
+            memcpy(work.hash, double_hash + 32, 32);
+            memcpy(work.blob, double_blob + work.blob_size, work.blob_size);
+            submit_work(mythr, &work);
+        }
+
+        (*nonceptr0) += 2;
+        (*nonceptr1) += 2;
+    }
+
+    tq_freeze(mythr->q);
+    return NULL;
+}
 
 
 /**
@@ -523,7 +610,7 @@ static bool start_mining() {
         thr->id = i;
         thr->q = tq_new();
 
-        if (unlikely(!thr->q || pthread_create(&thr->pth, NULL, miner_thread, thr))) {
+        if (unlikely(!thr->q || pthread_create(&thr->pth, NULL, opt_double_hash ? miner_thread_double : miner_thread, thr))) {
             applog(LOG_ERR, "thread %d create failed", i);
             return false;
         }
