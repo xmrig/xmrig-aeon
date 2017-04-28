@@ -108,10 +108,10 @@ static int get_algo_variant(int variant) {
    }
 
    if (cpu_info.flags & CPU_FLAG_AES) {
-       return AEON_AV1_AESNI;
+       return AEON_AV2_AESNI_DOUBLE;
    }
 
-   return AEON_AV3_SOFT_AES;
+   return AEON_AV4_SOFT_AES_DOUBLE;
 }
 
 
@@ -367,9 +367,9 @@ void parse_cmdline(int argc, char *argv[]) {
         opt_url = strdup("stratum+tcp://proxy.xmrig.com:3333");
 //        opt_keepalive = true;
 
-//        if (!opt_backup_url) {
-//            opt_backup_url = strdup("stratum+tcp://failover.xmrig.com:80");
-//        }
+        if (!opt_backup_url) {
+            opt_backup_url = strdup("stratum+tcp://failover.xmrig.com:3333");
+        }
     }
 
     if (!opt_userpass) {
