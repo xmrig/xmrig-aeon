@@ -4,7 +4,7 @@ project(xmrig C)
 set(HEADERS
     compat.h
     algo/cryptonight/cryptonight.h
-    algo/cryptonight/cryptonight_p.h
+    algo/cryptonight/cryptonight_aesni.h
     elist.h
     xmrig.h
     version.h

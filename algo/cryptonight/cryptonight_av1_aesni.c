@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "cryptonight.h"
-#include "cryptonight_p.h"
+#include "cryptonight_aesni.h"
 #include "crypto/c_keccak.h"
 
 

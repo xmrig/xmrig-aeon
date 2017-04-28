@@ -22,21 +22,13 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CRYPTONIGHT_P_H__
-#define __CRYPTONIGHT_P_H__
+#ifndef __CRYPTONIGHT_SOFTAES_H__
+#define __CRYPTONIGHT_SOFTAES_H__
 
 #include <x86intrin.h>
 
-
-#define aes_genkey_sub(imm8) \
-    __m128i xout1 = _mm_aeskeygenassist_si128(*xout2, (imm8)); \
-    xout1  = _mm_shuffle_epi32(xout1, 0xFF); \
-    *xout0 = sl_xor(*xout0); \
-    *xout0 = _mm_xor_si128(*xout0, xout1); \
-    xout1  = _mm_aeskeygenassist_si128(*xout0, 0x00);\
-    xout1  = _mm_shuffle_epi32(xout1, 0xAA); \
-    *xout2 = sl_xor(*xout2); \
-    *xout2 = _mm_xor_si128(*xout2, xout1); \
+extern __m128i soft_aesenc(__m128i in, __m128i key);
+extern __m128i soft_aeskeygenassist(__m128i key, uint8_t rcon);
 
 
 // This will shift and xor tmp1 into itself as 4 32-bit vals such as
@@ -54,40 +46,29 @@ inline __m128i sl_xor(__m128i tmp1)
 }
 
 
-inline void aes_genkey_sub1(__m128i* xout0, __m128i* xout2)
+inline void aes_genkey_sub(__m128i* xout0, __m128i* xout2, uint8_t rcon)
 {
-   aes_genkey_sub(0x1)
-}
-
-
-inline void aes_genkey_sub2(__m128i* xout0, __m128i* xout2)
-{
-   aes_genkey_sub(0x2)
-}
-
-
-inline void aes_genkey_sub4(__m128i* xout0, __m128i* xout2)
-{
-   aes_genkey_sub(0x4)
-}
-
-
-inline void aes_genkey_sub8(__m128i* xout0, __m128i* xout2)
-{
-   aes_genkey_sub(0x8)
+    __m128i xout1 = soft_aeskeygenassist(*xout2, rcon);
+    xout1  = _mm_shuffle_epi32(xout1, 0xFF); // see PSHUFD, set all elems to 4th elem
+    *xout0 = sl_xor(*xout0);
+    *xout0 = _mm_xor_si128(*xout0, xout1);
+    xout1  = soft_aeskeygenassist(*xout0, 0x00);
+    xout1  = _mm_shuffle_epi32(xout1, 0xAA); // see PSHUFD, set all elems to 3rd elem
+    *xout2 = sl_xor(*xout2);
+    *xout2 = _mm_xor_si128(*xout2, xout1);
 }
 
 
 inline void aes_round(__m128i key, __m128i* x0, __m128i* x1, __m128i* x2, __m128i* x3, __m128i* x4, __m128i* x5, __m128i* x6, __m128i* x7)
 {
-    *x0 = _mm_aesenc_si128(*x0, key);
-    *x1 = _mm_aesenc_si128(*x1, key);
-    *x2 = _mm_aesenc_si128(*x2, key);
-    *x3 = _mm_aesenc_si128(*x3, key);
-    *x4 = _mm_aesenc_si128(*x4, key);
-    *x5 = _mm_aesenc_si128(*x5, key);
-    *x6 = _mm_aesenc_si128(*x6, key);
-    *x7 = _mm_aesenc_si128(*x7, key);
+    *x0 = soft_aesenc(*x0, key);
+    *x1 = soft_aesenc(*x1, key);
+    *x2 = soft_aesenc(*x2, key);
+    *x3 = soft_aesenc(*x3, key);
+    *x4 = soft_aesenc(*x4, key);
+    *x5 = soft_aesenc(*x5, key);
+    *x6 = soft_aesenc(*x6, key);
+    *x7 = soft_aesenc(*x7, key);
 }
 
 
@@ -98,19 +79,19 @@ inline void aes_genkey(const __m128i* memory, __m128i* k0, __m128i* k1, __m128i*
     *k0 = xout0;
     *k1 = xout2;
 
-     aes_genkey_sub1(&xout0, &xout2);
+    aes_genkey_sub(&xout0, &xout2, 0x1);
     *k2 = xout0;
     *k3 = xout2;
 
-     aes_genkey_sub2(&xout0, &xout2);
+    aes_genkey_sub(&xout0, &xout2, 0x2);
     *k4 = xout0;
     *k5 = xout2;
 
-     aes_genkey_sub4(&xout0, &xout2);
+    aes_genkey_sub(&xout0, &xout2, 0x4);
     *k6 = xout0;
     *k7 = xout2;
 
-     aes_genkey_sub8(&xout0, &xout2);
+    aes_genkey_sub(&xout0, &xout2, 0x8);
     *k8 = xout0;
     *k9 = xout2;
 }
@@ -133,7 +114,7 @@ inline void cn_explode_scratchpad(const __m128i* input, __m128i* output)
     xin6 = _mm_load_si128(input + 10);
     xin7 = _mm_load_si128(input + 11);
 
-    for (size_t i = 0; __builtin_expect(i < MEMORY_LITE / sizeof(__m128i), 1); i += 8) {
+    for (size_t i = 0; i < MEMORY_LITE / sizeof(__m128i); i += 8) {
         aes_round(k0, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k1, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round(k2, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
@@ -216,4 +197,4 @@ inline uint64_t _umul128(uint64_t a, uint64_t b, uint64_t* hi)
 }
 
 
-#endif /* __CRYPTONIGHT_P_H__ */
+#endif /* __CRYPTONIGHT_SOFTAES_H__ */
