@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <mm_malloc.h>
 
 #ifndef BUILD_TEST
 #   include "xmrig.h"
