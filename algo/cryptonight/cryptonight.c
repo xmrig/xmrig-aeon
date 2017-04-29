@@ -160,10 +160,6 @@ int scanhash_cryptonight_double(int thr_id, uint32_t *hash, uint8_t *restrict bl
     uint32_t *nonceptr0 = (uint32_t*) (((char*) blob) + 39);
     uint32_t *nonceptr1 = (uint32_t*) (((char*) blob) + 39 + blob_size);
 
-    if (*nonceptr0 == *nonceptr1) {
-        (*nonceptr1)++;
-    }
-
     do {
         cryptonight_hash_ctx(blob, blob_size, hash, ctx);
         (*hashes_done) += 2;
@@ -182,9 +178,7 @@ int scanhash_cryptonight_double(int thr_id, uint32_t *hash, uint8_t *restrict bl
 
         (*nonceptr0)++;
         (*nonceptr1)++;
-    } while (likely(((*nonceptr1) < max_nonce && !work_restart[thr_id].restart)));
-
-    (*nonceptr0)++;
+    } while (likely(((*nonceptr0) < max_nonce && !work_restart[thr_id].restart)));
 
     return rc;
 }

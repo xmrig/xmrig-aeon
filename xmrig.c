@@ -356,19 +356,18 @@ static void *miner_thread_double(void *userdata) {
             nonceptr0 = (uint32_t*) (((char*) double_blob) + 39);
             nonceptr1 = (uint32_t*) (((char*) double_blob) + 39 + work.blob_size);
 
-            uint32_t nonce = 0xffffffffU / opt_n_threads * thr_id;
-            *nonceptr0 = nonce;
-            *nonceptr1 = nonce;
+            *nonceptr0 = 0xffffffffU / (opt_n_threads * 2) * thr_id;
+            *nonceptr1 = 0xffffffffU / (opt_n_threads * 2) * (thr_id + opt_n_threads);
         }
 
         pthread_mutex_unlock(&stratum_ctx->work_lock);
 
         work_restart[thr_id].restart = 0;
 
-        if (*nonceptr1 + LP_SCANTIME > end_nonce) {
+        if (*nonceptr0 + (LP_SCANTIME / 2) > end_nonce) {
             max_nonce = end_nonce;
         } else {
-            max_nonce = *nonceptr1 + LP_SCANTIME;
+            max_nonce = *nonceptr0 + (LP_SCANTIME / 2);
         }
 
         unsigned long hashes_done = 0;
@@ -396,8 +395,8 @@ static void *miner_thread_double(void *userdata) {
             submit_work(mythr, &work);
         }
 
-        (*nonceptr0) += 2;
-        (*nonceptr1) += 2;
+        ++(*nonceptr0);
+        ++(*nonceptr1);
     }
 
     tq_freeze(mythr->q);
