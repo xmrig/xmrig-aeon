@@ -44,15 +44,14 @@ static void print_memory() {
 static void print_cpu() {
     const char *t1 = (cpu_info.flags & CPU_FLAG_X86_64) ? OPT_COLOR(CL_LGR, "x86_64") : OPT_COLOR(CL_LRD, "-x86_64");
     const char *t2 = (cpu_info.flags & CPU_FLAG_AES)    ? OPT_COLOR(CL_LGR, "AES-NI") : OPT_COLOR(CL_LRD, "-AES-NI");
-    const char *t3 = (cpu_info.flags & CPU_FLAG_BMI2)   ? OPT_COLOR(CL_LGR, "BMI2")   : OPT_COLOR(CL_LRD, "-BMI2");
 
     if (opt_colors) {
         applog_notime(LOG_INFO, CL_LGR " * " CL_WHT "CPU:          %s", cpu_info.brand);
-        applog_notime(LOG_INFO, CL_LGR " * " CL_WHT "CPU FEATURES: %s %s %s", t1, t2, t3);
+        applog_notime(LOG_INFO, CL_LGR " * " CL_WHT "CPU FEATURES: %s %s", t1, t2);
     }
     else {
         applog_notime(LOG_INFO, " * CPU:          %s", cpu_info.brand);
-        applog_notime(LOG_INFO, " * CPU FEATURES: %s %s %s", t1, t2, t3);
+        applog_notime(LOG_INFO, " * CPU FEATURES: %s %s", t1, t2);
     }
 }
 
