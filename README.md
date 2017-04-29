@@ -13,7 +13,7 @@ Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of 
 * [Donations](#Donations)
 
 ## Features
-* ~~High performance (290+ H/s on i7 6700).~~
+* High performance (1100+ H/s on i7 6700).
 * Official Windows support.
 * Small Windows executable, only 430 KB without dependencies.
 * Support for backup (failover) mining server.
@@ -29,7 +29,7 @@ Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of 
 ## Usage
 ### Basic example
 ```
-xmrig.exe -o xmr-eu.dwarfpool.com:8005 -u YOUR_WALLET -p x -k
+xmrig.exe -o mine.aeon-pool.com:3333 -u YOUR_WALLET -p x
 ```
 
 ### Options
@@ -54,10 +54,22 @@ xmrig.exe -o xmr-eu.dwarfpool.com:8005 -u YOUR_WALLET -p x -k
 ```
 
 ## Algorithm variations
-* `--av=1` Default for CPUs with hardware AES.
+* `--av=1` Single hash hardware AES.
 * `--av=2` Double hash hardware AES.
-* `--av=3` Software AES implementation.
+* `--av=3` Single hash software AES implementation.
 * `--av=4` Double hash software AES implementation.
+
+### Single vs Double
+Single hash variations required 1 MB CPU L3 cache for one thread for optimal performance, double hash required 2MB per thread.
+Double hash usually better choice, less CPU usage and a fairly high hashrate.
+
+Example with Intel i7 6700:
+
+| AV       | Threads | H/s  | CPU usage |
+|----------|---------|------|-----------|
+| `--av=1` | 4       | 600  | 50%       |
+| `--av=2` | 4       | 1000 | 50%       |
+| `--av=1` | 8       | 1150 | 100%      |
 
 ## Build
 ### Ubuntu (Debian-based distros)
@@ -97,17 +109,11 @@ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCURL_INCLUDE_DIR="c:\<
 * Enable SeLockMemoryPrivilege. For Windows 7 pro, or Windows 8 and above see [this article](https://msdn.microsoft.com/en-gb/library/ms190730.aspx).
 
 ## Other information
-* Now only support 64 bit operating systems (Windows/Linux).
 * No HTTP support, only stratum protocol support.
 * No TLS support.
 * Default donation 5% (5 minutes in 100 minutes) can be reduced to 1% via command line option `--donate-level`.
 
-
-### CPU mining performance
-* ~~**i7-6700** - 290+ H/s (4 threads, cpu affinity 0xAA)~~
-* ~~**Dual E5620** - 377 H/s (12 threads, cpu affinity 0xEEEE)~~
-
-Please note performance is highly dependent on system load. The numbers above are obtained on an idle system. Tasks heavily using a processor cache, such as video playback, can greatly degrade hashrate. Optimal number of threads depends on the size of the L3 cache of a processor, 1 thread requires 2 MB of cache.
+Please note performance is highly dependent on system load. The numbers above are obtained on an idle system. Tasks heavily using a processor cache, such as video playback, can greatly degrade hashrate. Optimal number of threads depends on the size of the L3 cache of a processor, 1 thread requires 1 or 2 MB of cache.
 
 ### Maximum performance checklist
 * Idle operating system.
