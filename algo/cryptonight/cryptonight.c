@@ -36,7 +36,6 @@
 #include "crypto/c_skein.h"
 #include "cryptonight.h"
 #include "options.h"
-#include "utils/applog.h"
 
 
 const static char test_input[152] = {

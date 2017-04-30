@@ -302,7 +302,7 @@ static void *miner_thread(void *userdata) {
         const int rc = scanhash_cryptonight(thr_id, hash, work.blob, work.blob_size, work.target, max_nonce, &hashes_done, persistentctx);
         stats_add_hashes(thr_id, &tv_start, hashes_done);
 
-       if (!rc) {
+        if (!rc) {
             continue;
         }
 
