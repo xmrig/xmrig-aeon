@@ -1,4 +1,12 @@
 # XMRig for AEON
+
+[![Github All Releases](https://img.shields.io/github/downloads/xmrig/xmrig-aeon/total.svg)](../../releases)
+[![GitHub release](https://img.shields.io/github/release/xmrig/xmrig-aeon/all.svg)](../../releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/xmrig/xmrig-aeon.svg)](../../releases/latest)
+[![GitHub license](https://img.shields.io/github/license/xmrig/xmrig-aeon.svg)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/xmrig/xmrig-aeon.svg)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/xmrig/xmrig-aeon.svg)](../../network)
+
 :exclamation: :exclamation: :exclamation: **This repository now deprecated, please use [XMRig](https://github.com/xmrig/xmrig) with option `-a cryptonight-lite`.** :exclamation: :exclamation: :exclamation:
 
 XMRig is high performance [AEON](http://www.aeon.cash/) CPU miner, with the official full Windows support.
@@ -8,11 +16,14 @@ Based on cpuminer-multi with heavy optimizations/rewrites and removing a lot of 
 * [Features](#features)
 * [Download](#download)
 * [Usage](#usage)
+  * [Basic example](#basic-example)
+  * [Options](#options)
 * [Algorithm variations](#algorithm-variations)
 * [Build](#build)
 * [Common Issues](#common-issues)
 * [Other information](#other-information)
 * [Donations](#Donations)
+* [Contacts](#contacts)
 
 ## Features
 * High performance (1100+ H/s on i7 6700).
